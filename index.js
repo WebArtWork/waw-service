@@ -53,7 +53,7 @@ module.exports = async waw => {
 					path.join(template, 'dist', 'services.html'),
 					{
 						...seo,
-						description: 'Welcome to our platform, where you can find various services for your real estate needs. We offer a wide range of services that cover all aspects of construction, renovation, maintenance, and property management.',
+						description: waw.config.serviceDescription
 						services,
 						categories: await waw.tag_groups('service')
 					},
