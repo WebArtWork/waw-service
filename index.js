@@ -53,7 +53,7 @@ module.exports = async waw => {
 					path.join(template, 'dist', 'services.html'),
 					{
 						...seo,
-						description: waw.config.serviceDescription
+						description: waw.config.serviceDescription,
 						services,
 						categories: await waw.tag_groups('service')
 					},
