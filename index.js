@@ -53,7 +53,9 @@ module.exports = async waw => {
 					path.join(template, 'dist', 'services.html'),
 					{
 						...seo,
-						description: waw.config.serviceDescription,
+						title: waw.config.serviceTitle|| waw.config.title,
+                                                description: waw.config.serviceDescription || waw.config.description,
+                                                image: waw.config.serviceImage|| waw.config.image,
 						services,
 						categories: await waw.tag_groups('service')
 					},
@@ -70,7 +72,7 @@ module.exports = async waw => {
 		} else {
 			const tags = await waw.tags('service');
 
-			const service = await Service.findOne({
+			const service = await waw.Service.findOne({
 				_id: req.params._id
 			});
 
