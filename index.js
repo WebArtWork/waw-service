@@ -117,4 +117,10 @@ module.exports = async waw => {
 			}
 		}
 	});
+	await waw.wait(100);
+        if (waw.store_landing) {
+        waw.store_landing.services = async (query)=>{
+         return await waw.services(query, 4);
+    }
+}
 };
