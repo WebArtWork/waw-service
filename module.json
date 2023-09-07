@@ -3,6 +3,7 @@
     "name": "Service",
     "router": "index.js schema.js",
     "crud": {
+		"get": ["", "public"],
         "update": {
             "keys": [
 				"thumb",
