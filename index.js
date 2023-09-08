@@ -67,7 +67,7 @@ module.exports = async waw => {
                                                 description: waw.config.serviceDescription || waw.config.description,
                                                 image: waw.config.serviceImage|| waw.config.image,
 						services,
-						categories: waw.tag_groups('service')
+						categories: await waw.tag_groups('service')
 					},
 					waw.translate(req)
 				)
