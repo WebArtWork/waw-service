@@ -50,8 +50,6 @@ module.exports = async waw => {
 		if (typeof waw.serve_services[req.get("host")] === "function") {
 			waw.serve_services[req.get("host")](req, res);
 		} else {
-			const tags = await waw.tags('service');
-
 			const services = await waw.services(
 				req.params.tag_id ?
 					{ tag: req.params.tag_id } :
