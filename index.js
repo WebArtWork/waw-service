@@ -78,7 +78,6 @@ module.exports = async waw => {
 		if (typeof waw.serve_service[req.get("host")] === "function") {
 			waw.serve_service[req.get("host")](req, res);
 		} else {
-			const tags = await waw.tags('service');
 
 			const service = await waw.Service.findOne({
 				_id: req.params._id
