@@ -2,13 +2,13 @@ const path = require('path');
 const template = path.join(process.cwd(), 'template');
 
 module.exports = async waw => {
-	waw.services = async (query, limit) => {
+	waw.services = async (query = {}, limit, count = false) => {
+		let exe = count ? waw.Service.countDocuments(query) : waw.Service.find(query);
 		if (limit) {
-			return await waw.Service.find(query).limit(limit);
-		} else {
-			return await waw.Service.find(query);
+			exe = exe.limit(limit);
 		}
-	}
+		return await exe;
+	};
 
 	waw.service = async (query) => {
 		return await waw.Service.findOne(query);
