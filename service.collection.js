@@ -3,6 +3,7 @@ module.exports = function(waw) {
 		thumb: String,
 		thumbs: [String],
 		name: String,
+		url: { type: String, sparse: true, trim: true, unique: true },
 		short: String,
 		description: String,
 		data: {},
@@ -31,6 +32,8 @@ module.exports = function(waw) {
 		this.tag = obj.tag;
 
 		this.thumb = obj.thumb;
+
+		this.url = obj.url;
 
 		this.thumbs = obj.thumbs;
 
