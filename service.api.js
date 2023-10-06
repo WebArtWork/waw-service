@@ -34,6 +34,23 @@ module.exports = async waw => {
 					_id: req.body._id
 				}
 			}
+		},
+		create: {
+			ensure: waw.role( async (req, res, next) => {
+				if (req.body.name) {
+					req.body.url = req.body.name
+						.toLowerCase()
+						.replace(/[^a-z0-9]/g, "");
+				}
+				while (await waw.Service.count({ url: req.body.url })) {
+					const url = req.body.url.split("_");
+					req.body.url =
+						url[0] +
+						"_" +
+						(url.length > 1 ? Number(url[1]) + 1 : 1);
+				}
+				next();
+			}),
 		}
 	})
 	const seo = {
@@ -79,9 +96,11 @@ module.exports = async waw => {
 			waw.serve_service[req.get("host")](req, res);
 		} else {
 
-			const service = await waw.Service.findOne({
-				_id: req.params._id
-			});
+			const service = await waw.Service.findOne(
+			waw.mongoose.Types.ObjectId.isValid(req.params._id)
+				? { _id: req.params._id }
+				: { url: req.params._id }
+			);
 
 			res.send(
 				waw.render(
