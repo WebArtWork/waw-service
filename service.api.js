@@ -76,7 +76,7 @@ module.exports = async waw => {
 				waw.render(
 					path.join(template, 'dist', 'services.html'),
 					{
-						...seo,
+						...waw.config,
 						groups: waw.tag_groups('service'),
 						title: waw.config.serviceTitle|| waw.config.title,
                                                 description: waw.config.serviceDescription || waw.config.description,
@@ -106,7 +106,7 @@ module.exports = async waw => {
 				waw.render(
 					path.join(template, 'dist', 'service.html'),
 					{
-						...seo,
+						...waw.config,
 						...{
 							service,
 							categories: await waw.tag_groups('service')
