@@ -36,7 +36,7 @@ module.exports = async waw => {
 			}
 		},
 		create: {
-			ensure: waw.role( async (req, res, next) => {
+			ensure: async (req, res, next) => {
 				if (req.body.name) {
 					req.body.url = req.body.name
 						.toLowerCase()
@@ -50,7 +50,7 @@ module.exports = async waw => {
 						(url.length > 1 ? Number(url[1]) + 1 : 1);
 				}
 				next();
-			}),
+			}
 		}
 	})
 	const seo = {
