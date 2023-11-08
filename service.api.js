@@ -25,6 +25,37 @@ module.exports = async waw => {
 				query: ()=>{
 					return {};
 				}
+			},
+			{
+				name: 'tilities',
+				ensure: waw.next,
+				query: () => {
+					return {
+						isTemplate: true
+					};
+				}
+			},
+			{
+				name: 'links',
+				ensure: async (req, res, next)=>{
+					if (req.user) {
+						req.utilities_ids = (await waw.Service.find({
+							moderators: req.user._id,
+							isTemplate: true
+						}).select('_id')).map(p => p.id);
+
+						next();
+					} else {
+						res.json([]);
+					}
+				},
+				query: (req) => {
+					return {
+						template: {
+							$in: req.utilities_ids
+						}
+					};
+				}
 			}
 		],
 		fetch: {
