@@ -6,6 +6,11 @@ module.exports = function(waw) {
 		url: { type: String, sparse: true, trim: true, unique: true },
 		short: String,
 		description: String,
+		isTemplate: Boolean,
+ 		template: {
+			type: waw.mongoose.Schema.Types.ObjectId,
+			ref: "Product",
+		},
 		data: {},
 		tag: {
 			type: waw.mongoose.Schema.Types.ObjectId,
@@ -44,6 +49,10 @@ module.exports = function(waw) {
 		this.short = obj.short;
 
 		this.data = obj.data;
+
+		this.isTemplate = obj.isTemplate;
+
+		this.template = obj.template;
 	}
 
 	return waw.Service = waw.mongoose.model('Service', Schema);
