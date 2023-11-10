@@ -2,20 +2,38 @@
     "repo" : "git@github.com:WebArtWork/waw-service.git",
     "name": "Service",
     "crud": {
- 	"get": ["", "public", "utilities", "links"],
+ 	"get": ["", "public", "utilities", "links", "admin"],
 	"unique": [ "url" ],
-        "update": {
-            "keys": [
-				"thumb",
-				"thumbs",
-				"name",
-				"description",
-				"short",
-				"tag",
-				"data"
-            ]
-        },
-        "delete": [""]
-    },
-    "dependencies": {}
+       "update": [
+      {
+        "name": "admin",
+        "keys": [
+          "thumb",
+          "thumbs",
+          "name",
+          "description",
+          "price",
+          "short",
+          "tag",
+          "sale",
+          "data"
+        ]
+      },
+      {
+        "keys": [
+          "thumb",
+          "thumbs",
+          "name",
+          "description",
+          "price",
+          "short",
+          "tag",
+          "sale",
+          "data"
+        ]
+      }
+    ],
+    "delete": ["", "admin"]
+  },
+  "dependencies": {}
 }
