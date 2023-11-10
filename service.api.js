@@ -55,6 +55,7 @@ module.exports = async waw => {
 							$in: req.utilities_ids
 						}
 					};
+				}
 				},
 				{
 				name: 'admin',
