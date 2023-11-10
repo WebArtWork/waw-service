@@ -55,9 +55,29 @@ module.exports = async waw => {
 							$in: req.utilities_ids
 						}
 					};
+				},
+				{
+				name: 'admin',
+				ensure: waw.role('admin'),
+				query: () => {
+					return {};
 				}
-			}
+			},
 		],
+		update: {
+			name: 'admin',
+			ensure: waw.role('admin'),
+			query: (req) => {
+				return { _id: req.body._id };
+			}
+		},
+		delete: {
+			name: 'admin',
+			ensure: waw.role('admin'),
+			query: (req) => {
+				return { _id: req.body._id };
+			}
+		},
 		fetch: {
 			ensure: waw.next,
 			query: req => {
