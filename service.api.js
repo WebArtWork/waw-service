@@ -22,7 +22,7 @@ module.exports = async waw => {
 			{
 				name: 'public',
 				ensure: waw.next,
-				query: ()=>{
+				query: () => {
 					return {};
 				}
 			},
@@ -37,7 +37,7 @@ module.exports = async waw => {
 			},
 			{
 				name: 'links',
-				ensure: async (req, res, next)=>{
+				ensure: async (req, res, next) => {
 					if (req.user) {
 						req.utilities_ids = (await waw.Service.find({
 							moderators: req.user._id,
@@ -56,8 +56,8 @@ module.exports = async waw => {
 						}
 					};
 				}
-				},
-				{
+			},
+			{
 				name: 'admin',
 				ensure: waw.role('admin'),
 				query: () => {
@@ -94,15 +94,15 @@ module.exports = async waw => {
 						.toLowerCase()
 						.replace(/[^a-z0-9]/g, "");
 				}
-				if(req.body.url) {
-				while (await waw.Service.count({ url: req.body.url })) {
-					const url = req.body.url.split("_");
-					req.body.url =
-						url[0] +
-						"_" +
-						(url.length > 1 ? Number(url[1]) + 1 : 1);
+				if (req.body.url) {
+					while (await waw.Service.count({ url: req.body.url })) {
+						const url = req.body.url.split("_");
+						req.body.url =
+							url[0] +
+							"_" +
+							(url.length > 1 ? Number(url[1]) + 1 : 1);
+					}
 				}
-			}
 				next();
 			}
 		}
@@ -113,48 +113,47 @@ module.exports = async waw => {
 		image: 'https://body.webart.work/template/img/logo.png'
 	};
 
-	waw.build(template, 'services');
-	waw.build(template, 'service');
-	waw.serve_services = {};
-	waw.serve_service = {};
-	const services = async (req, res) => {
-		if (typeof waw.serve_services[req.get("host")] === "function") {
-			waw.serve_services[req.get("host")](req, res);
-		} else {
-			const services = await waw.services(
-				req.params.tag_id ?
-					{ tag: req.params.tag_id } :
-					{}
-			);
-			res.send(
-				waw.render(
-					path.join(template, 'dist', 'services.html'),
-					{
-						...waw.config,
-						groups: waw.tag_groups('service'),
-						title: waw.config.serviceTitle|| waw.config.title,
-                                                description: waw.config.serviceDescription || waw.config.description,
-                                                image: waw.config.serviceImage|| waw.config.image,
-						services,
-						categories: await waw.tag_groups('service')
-					},
-					waw.translate(req)
-				)
-			)
-		}
-	}
-	waw.app.get('/services', services);
-	waw.app.get('/services/:tag_id', services);
-	waw.app.get('/service/:_id', async (req, res) => {
-		if (typeof waw.serve_service[req.get("host")] === "function") {
-			waw.serve_service[req.get("host")](req, res);
-		} else {
+	const services = await waw.services(
+		req.params.tag_id ?
+			{ tag: req.params.tag_id } :
+			{}
+	);
+	res.send(
+		waw.render(
+			path.join(template, 'dist', 'services.html'),
+			{
+				...waw.config,
+				groups: waw.tag_groups('service'),
+				title: waw.config.serviceTitle || waw.config.title,
+				description: waw.config.serviceDescription || waw.config.description,
+				image: waw.config.serviceImage || waw.config.image,
+				services,
+				categories: await waw.tag_groups('service')
+			},
+			waw.translate(req)
+		)
+	)
+};
 
-			const service = await waw.Service.findOne(
+waw.api({
+	domain: waw.config.land,
+	template: {
+		path: template,
+		prefix: "/template",
+		pages: "service services",
+	},
+	page: {
+		"/test/:any": (req, res) => {
+			res.json(req.urlParams);
+		},
+		"/services": services,
+		"/services/:tag_id": services,
+		"/service/:_id": async (req, res) => {
+				const service = await waw.Service.findOne(
 			waw.mongoose.Types.ObjectId.isValid(req.params._id)
 				? { _id: req.params._id }
 				: { url: req.params._id }
-			);
+		);
 
 			res.send(
 				waw.render(
@@ -170,37 +169,37 @@ module.exports = async waw => {
 				)
 			)
 		}
-	});
+	}
+});
 
-	const save_file = (doc) => {
-		if (doc.thumb) {
-			waw.save_file(doc.thumb);
-		}
-
-		if (doc.thumbs) {
-			for (const thumb of doc.thumbs) {
-				waw.save_file(thumb);
-			}
-		}
+const save_file = (doc) => {
+	if (doc.thumb) {
+		waw.save_file(doc.thumb);
 	}
 
-	waw.on('service_create', save_file);
-	waw.on('service_update', save_file);
-	waw.on('service_delete', (doc) => {
-		if (doc.thumb) {
-			waw.delete_file(doc.thumb);
+	if (doc.thumbs) {
+		for (const thumb of doc.thumbs) {
+			waw.save_file(thumb);
 		}
-
-		if (doc.thumbs) {
-			for (const thumb of doc.thumbs) {
-				waw.delete_file(thumb);
-			}
-		}
-	});
-	await waw.wait(2000);
-        if (waw.store_landing) {
-        waw.store_landing.services = async (query)=>{
-         return await waw.services(query, 4);
-    }
+	}
 }
-};
+
+waw.on('service_create', save_file);
+waw.on('service_update', save_file);
+waw.on('service_delete', (doc) => {
+	if (doc.thumb) {
+		waw.delete_file(doc.thumb);
+	}
+
+	if (doc.thumbs) {
+		for (const thumb of doc.thumbs) {
+			waw.delete_file(thumb);
+		}
+	}
+});
+await waw.wait(2000);
+if (waw.store_landing) {
+	waw.store_landing.services = async (query) => {
+		return await waw.services(query, 4);
+	}
+}
