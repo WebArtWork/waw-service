@@ -133,7 +133,6 @@ module.exports = async waw => {
 			waw.translate(req)
 		)
 	)
-};
 
 waw.api({
 	domain: waw.config.land,
@@ -202,4 +201,5 @@ if (waw.store_landing) {
 	waw.store_landing.services = async (query) => {
 		return await waw.services(query, 4);
 	}
+}
 }
