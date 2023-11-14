@@ -113,6 +113,7 @@ module.exports = async waw => {
 		image: 'https://body.webart.work/template/img/logo.png'
 	};
 
+	const services = async (req, res) => {
 	const services = await waw.services(
 		req.params.tag_id ?
 			{ tag: req.params.tag_id } :
@@ -133,6 +134,7 @@ module.exports = async waw => {
 			waw.translate(req)
 		)
 	)
+		}
 
 waw.api({
 	domain: waw.config.land,
