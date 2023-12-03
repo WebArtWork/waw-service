@@ -107,11 +107,7 @@ module.exports = async waw => {
 			}
 		}
 	})
-	const seo = {
-		title: waw.config.name,
-		description: waw.config.description,
-		image: 'https://body.webart.work/template/img/logo.png'
-	};
+
 
 	const services = async (req, res) => {
 	const services = await waw.services(
@@ -172,6 +168,14 @@ waw.api({
 		}
 	}
 });
+
+waw.storeServices = async (store, fillJson) => {
+	fillJson.services = await waw.services({
+		author: store.author
+	});
+
+	fillJson.footer.services = fillJson.services;
+}
 
 const save_file = (doc) => {
 	if (doc.thumb) {
