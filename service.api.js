@@ -177,6 +177,15 @@ waw.storeServices = async (store, fillJson) => {
 	fillJson.footer.services = fillJson.services;
 }
 
+waw.storeService = async (store, fillJson, req) => {
+	fillJson.service = await waw.service({
+		 author: store.author,
+		_id: req.params._id  
+	});
+
+	fillJson.footer.service = fillJson.service;
+	}
+
 const save_file = (doc) => {
 	if (doc.thumb) {
 		waw.save_file(doc.thumb);
