@@ -173,7 +173,24 @@ module.exports = async waw => {
 		fillJson.services = await waw.services({
 			author: store.author
 		});
-
+	
+		fillJson.servicesByTag = [];
+		for (const service of fillJson.services) {
+			 if (!service.tag) continue;
+			const tagObj = fillJson.servicesByTag.find(c => c.id === service.tag.toString());
+			if (tagObj) {
+				tagObj.services.push(service);
+			} else {
+				const tag = waw.getTag(service.tag);
+				fillJson.servicesByTag.push({
+					id: service.tag,
+					name: tag.name,
+					short: tag.short,
+					tags: [service]
+				})
+			}
+		}
+	
 		fillJson.footer.services = fillJson.services;
 	}
 
