@@ -110,111 +110,119 @@ module.exports = async waw => {
 
 
 	const services = async (req, res) => {
-	const services = await waw.services(
-		req.params.tag_id ?
-			{ tag: req.params.tag_id } :
-			{}
-	);
-	res.send(
-		waw.render(
-			path.join(template, 'dist', 'services.html'),
-			{
-				...waw.config,
-				groups: waw.tag_groups('service'),
-				title: waw.config.serviceTitle || waw.config.title,
-				description: waw.config.serviceDescription || waw.config.description,
-				image: waw.config.serviceImage || waw.config.image,
-				services,
-				categories: await waw.tag_groups('service')
-			},
-			waw.translate(req)
-		)
-	)
-		}
-
-waw.api({
-	domain: waw.config.land,
-	template: {
-		path: template,
-		prefix: "/template",
-		pages: "service services",
-	},
-	page: {
-		"/test/:any": (req, res) => {
-			res.json(req.urlParams);
-		},
-		"/services": services,
-		"/services/:tag_id": services,
-		"/service/:_id": async (req, res) => {
-				const service = await waw.Service.findOne(
-			waw.mongoose.Types.ObjectId.isValid(req.params._id)
-				? { _id: req.params._id }
-				: { url: req.params._id }
+		const services = await waw.services(
+			req.params.tag_id ?
+				{ tag: req.params.tag_id } :
+				{}
 		);
-
-			res.send(
-				waw.render(
-					path.join(template, 'dist', 'service.html'),
-					{
-						...waw.config,
-						...{
-							service,
-							categories: await waw.tag_groups('service')
-						}
-					},
-					waw.translate(req)
-				)
+		res.send(
+			waw.render(
+				path.join(template, 'dist', 'services.html'),
+				{
+					...waw.config,
+					groups: waw.tag_groups('service'),
+					title: waw.config.serviceTitle || waw.config.title,
+					description: waw.config.serviceDescription || waw.config.description,
+					image: waw.config.serviceImage || waw.config.image,
+					services,
+					categories: await waw.tag_groups('service')
+				},
+				waw.translate(req)
 			)
-		}
+		)
 	}
-});
 
-waw.storeServices = async (store, fillJson) => {
-	fillJson.services = await waw.services({
-		author: store.author
+	waw.api({
+		domain: waw.config.land,
+		template: {
+			path: template,
+			prefix: "/template",
+			pages: "service services",
+		},
+		page: {
+			"/test/:any": (req, res) => {
+				res.json(req.urlParams);
+			},
+			"/services": services,
+			"/services/:tag_id": services,
+			"/service/:_id": async (req, res) => {
+				const service = await waw.Service.findOne(
+					waw.mongoose.Types.ObjectId.isValid(req.params._id)
+						? { _id: req.params._id }
+						: { url: req.params._id }
+				);
+
+				res.send(
+					waw.render(
+						path.join(template, 'dist', 'service.html'),
+						{
+							...waw.config,
+							...{
+								service,
+								categories: await waw.tag_groups('service')
+							}
+						},
+						waw.translate(req)
+					)
+				)
+			}
+		}
 	});
 
-	fillJson.footer.services = fillJson.services;
-}
+	waw.storeServices = async (store, fillJson) => {
+		fillJson.services = await waw.services({
+			author: store.author
+		});
 
-waw.storeService = async (store, fillJson, req) => {
-	fillJson.service = await waw.service({
-		 author: store.author,
-		_id: req.params._id  
+		fillJson.footer.services = fillJson.services;
+	}
+
+	waw.storeService = async (store, fillJson, req) => {
+		fillJson.service = await waw.service({
+			author: store.author,
+			_id: req.params._id
+		});
+
+		fillJson.footer.service = fillJson.service;
+	}
+
+	waw.storeTopServices = async (store, fillJson) => {
+		fillJson.topServices = await waw.services({
+			author: store.author,
+		}, 4);
+
+		fillJson.footer.topServices = fillJson.topServices;
+	}
+
+	const save_file = (doc) => {
+		if (doc.thumb) {
+			waw.save_file(doc.thumb);
+		}
+
+		if (doc.thumbs) {
+			for (const thumb of doc.thumbs) {
+				waw.save_file(thumb);
+			}
+		}
+	}
+
+	waw.on('service_create', save_file);
+	waw.on('service_update', save_file);
+	waw.on('service_delete', (doc) => {
+		if (doc.thumb) {
+			waw.delete_file(doc.thumb);
+		}
+
+		if (doc.thumbs) {
+			for (const thumb of doc.thumbs) {
+				waw.delete_file(thumb);
+			}
+		}
 	});
-
-	fillJson.footer.service = fillJson.service;
-	}
-
-const save_file = (doc) => {
-	if (doc.thumb) {
-		waw.save_file(doc.thumb);
-	}
-
-	if (doc.thumbs) {
-		for (const thumb of doc.thumbs) {
-			waw.save_file(thumb);
+	await waw.wait(2000);
+	if (waw.store_landing) {
+		waw.store_landing.services = async (query) => {
+			return await waw.services(query, 4);
 		}
 	}
-}
-
-waw.on('service_create', save_file);
-waw.on('service_update', save_file);
-waw.on('service_delete', (doc) => {
-	if (doc.thumb) {
-		waw.delete_file(doc.thumb);
-	}
-
-	if (doc.thumbs) {
-		for (const thumb of doc.thumbs) {
-			waw.delete_file(thumb);
-		}
-	}
-});
-await waw.wait(2000);
-if (waw.store_landing) {
-	waw.store_landing.services = async (query) => {
-		return await waw.services(query, 4);
-	}
-}
 }
