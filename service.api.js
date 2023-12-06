@@ -186,7 +186,7 @@ module.exports = async waw => {
 					id: service.tag,
 					name: tag.name,
 					short: tag.short,
-					tags: [service]
+					services: [service]
 				})
 			}
 		}
