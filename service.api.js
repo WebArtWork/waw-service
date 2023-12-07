@@ -177,7 +177,7 @@ module.exports = async waw => {
 		fillJson.servicesByTag = [];
 		for (const service of fillJson.services) {
 			 if (!service.tag) continue;
-			const tagObj = fillJson.servicesByTag.find(c => c.id === service.tag.toString());
+			const tagObj = fillJson.servicesByTag.find(c => c.id.toString() === service.tag.toString());
 			if (tagObj) {
 				tagObj.services.push(service);
 			} else {
