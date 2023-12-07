@@ -194,15 +194,54 @@ module.exports = async waw => {
 		fillJson.footer.services = fillJson.services;
 	}
 
-	waw.storeService = async (store, fillJson, req) => {
-		fillJson.service = await waw.service({
-			author: store.author,
-			_id: req.params._id
+	waw.storeServices = async (store, fillJson) => {
+		fillJson.services = await waw.services({
+			author: store.author
 		});
 
-		fillJson.footer.service = fillJson.service;
-	}
+		fillJson.servicesByTag = [];
+		for (const service of fillJson.services) {
+			if (!service.tag) continue;
+			const tagObj = fillJson.servicesByTag.find(c => c.id.toString() === service.tag.toString());
+			if (tagObj) {
+				tagObj.services.push(service);
+			} else {
+				const tag = waw.getTag(service.tag);
 
+				fillJson.servicesByTag.push({
+					id: service.tag,
+					category: tag.category,
+					name: tag.name,
+					description: tag.description,
+					services: [service]
+				})
+			}
+		}
+
+		fillJson.servicesByCategory = [];
+		for (const byTag of fillJson.servicesByTag) {
+			const categoryObj = fillJson.servicesByCategory.find(c => c.id.toString() === byTag.category.toString());
+			if (categoryObj) {
+				categoryObj.tags.push(byTag);
+
+				for (const service of byTag.services) {
+					if (!categoryObj.services.find(s => s.id === service.id)) {
+						categoryObj.services.push(service)
+					}
+				}
+			} else {
+				const category = waw.getCategory(byTag.category);
+
+				fillJson.servicesByCategory.push({
+					id: byTag.category,
+					name: category.name,
+					description: category.description,
+					services: byTag.services.slice(),
+					tags: [byTag]
+				})
+			}
+		}
+	}
 	waw.storeTopServices = async (store, fillJson) => {
 		fillJson.topServices = await waw.services({
 			author: store.author,
