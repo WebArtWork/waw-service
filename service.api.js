@@ -169,32 +169,7 @@ module.exports = async waw => {
 		}
 	});
 
-	waw.storeServices = async (store, fillJson) => {
-		fillJson.services = await waw.services({
-			author: store.author
-		});
-	
-		fillJson.servicesByTag = [];
-		for (const service of fillJson.services) {
-			 if (!service.tag) continue;
-			const tagObj = fillJson.servicesByTag.find(c => c.id.toString() === service.tag.toString());
-			if (tagObj) {
-				tagObj.services.push(service);
-			} else {
-				const tag = waw.getTag(service.tag);
-				fillJson.servicesByTag.push({
-					id: service.tag,
-					name: tag.name,
-					short: tag.short,
-					services: [service]
-				})
-			}
-		}
-	
-		fillJson.footer.services = fillJson.services;
-	}
-
-	waw.storeServices = async (store, fillJson) => {
+waw.storeServices = async (store, fillJson) => {
 		fillJson.services = await waw.services({
 			author: store.author
 		});
@@ -242,6 +217,16 @@ module.exports = async waw => {
 			}
 		}
 	}
+
+	waw.storeService = async (store, fillJson, req) => {
+		fillJson.service = await waw.service({
+			author: store.author,
+			_id: req.params._id
+		});
+
+		fillJson.footer.service = fillJson.service;
+	}
+
 	waw.storeTopServices = async (store, fillJson) => {
 		fillJson.topServices = await waw.services({
 			author: store.author,
@@ -250,6 +235,17 @@ module.exports = async waw => {
 		fillJson.footer.topServices = fillJson.topServices;
 	}
 
+	const save_file = (doc) => {
+		if (doc.thumb) {
+			waw.save_file(doc.thumb);
+		}
+
+		if (doc.thumbs) {
+			for (const thumb of doc.thumbs) {
+				waw.save_file(thumb);
+			}
+		}
+	}
 	const save_file = (doc) => {
 		if (doc.thumb) {
 			waw.save_file(doc.thumb);
