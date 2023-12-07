@@ -169,7 +169,7 @@ module.exports = async waw => {
 		}
 	});
 
-waw.storeServices = async (store, fillJson) => {
+	waw.storeServices = async (store, fillJson) => {
 		fillJson.services = await waw.services({
 			author: store.author
 		});
@@ -233,18 +233,6 @@ waw.storeServices = async (store, fillJson) => {
 		}, 4);
 
 		fillJson.footer.topServices = fillJson.topServices;
-	}
-
-	const save_file = (doc) => {
-		if (doc.thumb) {
-			waw.save_file(doc.thumb);
-		}
-
-		if (doc.thumbs) {
-			for (const thumb of doc.thumbs) {
-				waw.save_file(thumb);
-			}
-		}
 	}
 	const save_file = (doc) => {
 		if (doc.thumb) {
