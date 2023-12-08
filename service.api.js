@@ -182,7 +182,7 @@ module.exports = async waw => {
 				tagObj.services.push(service);
 			} else {
 				const tag = waw.getTag(service.tag);
-
+				if (tag) {
 				fillJson.servicesByTag.push({
 					id: service.tag,
 					category: tag.category,
