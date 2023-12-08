@@ -206,7 +206,7 @@ module.exports = async waw => {
 				}
 			} else {
 				const category = waw.getCategory(byTag.category);
-
+				if (category) {
 				fillJson.servicesByCategory.push({
 					id: byTag.category,
 					name: category.name,
@@ -214,6 +214,7 @@ module.exports = async waw => {
 					services: byTag.services.slice(),
 					tags: [byTag]
 				})
+				}
 			}
 		}
 	}
