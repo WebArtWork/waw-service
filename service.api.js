@@ -182,14 +182,15 @@ module.exports = async waw => {
 				tagObj.services.push(service);
 			} else {
 				const tag = waw.getTag(service.tag);
-
-				fillJson.servicesByTag.push({
-					id: service.tag,
-					category: tag.category,
-					name: tag.name,
-					description: tag.description,
-					services: [service]
-				})
+				if (tag) {
+					fillJson.servicesByTag.push({
+						id: service.tag,
+						category: tag.category,
+						name: tag.name,
+						description: tag.description,
+						services: [service]
+					})
+				}
 			}
 		}
 
@@ -207,13 +208,13 @@ module.exports = async waw => {
 			} else {
 				const category = waw.getCategory(byTag.category);
 				if (category) {
-				fillJson.servicesByCategory.push({
-					id: byTag.category,
-					name: category.name,
-					description: category.description,
-					services: byTag.services.slice(),
-					tags: [byTag]
-				})
+					fillJson.servicesByCategory.push({
+						id: byTag.category,
+						name: category.name,
+						description: category.description,
+						services: byTag.services.slice(),
+						tags: [byTag]
+					})
 				}
 			}
 		}
