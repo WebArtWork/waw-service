@@ -113,8 +113,8 @@ module.exports = async waw => {
 		const services = await waw.services(
 			req.params.tag_id ?
 				{ tag: req.params.tag_id } :
-				{}
-		));
+				{},10
+		);
 		res.send(
 			waw.render(
 				path.join(template, 'dist', 'services.html'),
