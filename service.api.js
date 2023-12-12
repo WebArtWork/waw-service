@@ -114,7 +114,7 @@ module.exports = async waw => {
 			req.params.tag_id ?
 				{ tag: req.params.tag_id } :
 				{}
-		).limit(10);
+		));
 		res.send(
 			waw.render(
 				path.join(template, 'dist', 'services.html'),
