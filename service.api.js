@@ -64,6 +64,12 @@ module.exports = async waw => {
 					return {};
 				}
 			},
+			{
+				ensure: waw.next,
+				query: req => {
+					return { domain: req.get('host') };
+				}
+			}
 		],
 		update: {
 			name: 'admin',
@@ -104,17 +110,25 @@ module.exports = async waw => {
 					}
 				}
 				next();
+			},
+			ensureDomain: async (req, res, next) => {
+				req.body.domain = req.get('host');
+				next();
 			}
 		}
 	})
 
 
-	const services = async (req, res) => {
-		const services = await waw.services(
-			req.params.tag_id ?
-				{ tag: req.params.tag_id } :
-				{},10
-		);
+	waw.serveServices = async (req, res) => {
+		const query = {};
+		if (req.params.tag_id) {
+			query.tag = req.params.tag_id;
+		}
+		if (req.get('host') !== waw.config.land) {
+			query.domain = req.get('host');
+		}
+		const services = await waw.Servicefind(query).limit(10);
+
 		res.send(
 			waw.render(
 				path.join(template, 'dist', 'services.html'),
@@ -143,31 +157,33 @@ module.exports = async waw => {
 			"/test/:any": (req, res) => {
 				res.json(req.urlParams);
 			},
-			"/services": services,
-			"/services/:tag_id": services,
-			"/service/:_id": async (req, res) => {
-				const service = await waw.Service.findOne(
-					waw.mongoose.Types.ObjectId.isValid(req.params._id)
-						? { _id: req.params._id }
-						: { url: req.params._id }
-				);
-
-				res.send(
-					waw.render(
-						path.join(template, 'dist', 'service.html'),
-						{
-							...waw.config,
-							...{
-								service,
-								categories: await waw.tag_groups('service')
-							}
-						},
-						waw.translate(req)
-					)
-				)
-			}
+			"/services": waw.serveServices,
+			"/services/:tag_id": waw.serveServices,
+			"/service/:_id": waw.serveService
 		}
 	});
+
+	waw.serveService = async (req, res) => {
+		const service = await waw.Service.findOne(
+			waw.mongoose.Types.ObjectId.isValid(req.params._id)
+				? { _id: req.params._id }
+				: { url: req.params._id }
+		);
+
+		res.send(
+			waw.render(
+				path.join(template, 'dist', 'service.html'),
+				{
+					...waw.config,
+					...{
+						service,
+						categories: await waw.tag_groups('service')
+					}
+				},
+				waw.translate(req)
+			)
+		)
+	}
 
 	waw.storeServices = async (store, fillJson) => {
 		fillJson.services = await waw.services({
