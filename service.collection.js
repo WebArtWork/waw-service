@@ -7,6 +7,7 @@ module.exports = function(waw) {
 		short: String,
 		description: String,
 		isTemplate: Boolean,
+		domain: String,
  		template: {
 			type: waw.mongoose.Schema.Types.ObjectId,
 			ref: "Product",
@@ -35,6 +36,8 @@ module.exports = function(waw) {
 		this.moderators = [user._id];
 
 		this.tag = obj.tag;
+
+		this.domain = obj.domain;
 
 		this.thumb = obj.thumb;
 
