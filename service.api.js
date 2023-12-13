@@ -135,7 +135,7 @@ module.exports = async waw => {
 		if (req.get('host') !== waw.config.land) {
 			query.domain = req.get('host');
 		}
-		const services = await waw.Servicefind(query).limit(10);
+		const services = await waw.Service.find(query).limit(10);
 
 		res.send(
 			waw.render(
