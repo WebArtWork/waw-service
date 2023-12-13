@@ -118,6 +118,12 @@ module.exports = async waw => {
 		}
 	})
 
+	const docs = await waw.Service.find({});
+	for (const doc of docs) {
+	doc.domain = waw.config.land;
+	await doc.save();
+	}
+
 
 	waw.serveServices = async (req, res) => {
 		const query = {};
