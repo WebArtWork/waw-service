@@ -8,7 +8,6 @@ module.exports = function(waw) {
 		description: String,
 		domain: String,
 		isTemplate: Boolean,
-		domain: String,
  		template: {
 			type: waw.mongoose.Schema.Types.ObjectId,
 			ref: "Product",
@@ -42,7 +41,6 @@ module.exports = function(waw) {
 
 		this.thumb = obj.thumb;
 
-		this.domain = obj.domain;
 
 		this.url = obj.url;
 
