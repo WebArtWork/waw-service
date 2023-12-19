@@ -2,18 +2,6 @@ const path = require('path');
 const template = path.join(process.cwd(), 'template');
 
 module.exports = async waw => {
-	waw.services = async (query = {}, limit, count = false) => {
-		let exe = count ? waw.Service.countDocuments(query) : waw.Service.find(query);
-		if (limit) {
-			exe = exe.limit(limit);
-		}
-		return await exe;
-	};
-
-	waw.service = async (query) => {
-		return await waw.Service.findOne(query);
-	}
-
 	waw.crud('service', {
 		get: [
 			{
@@ -273,6 +261,18 @@ module.exports = async waw => {
 		}, 4);
 
 		fillJson.footer.topServices = fillJson.topServices;
+	}
+
+	waw.services = async (query = {}, limit, count = false) => {
+		let exe = count ? waw.Service.countDocuments(query) : waw.Service.find(query);
+		if (limit) {
+			exe = exe.limit(limit);
+		}
+		return await exe;
+	};
+
+	waw.service = async (query) => {
+		return await waw.Service.findOne(query);
 	}
 	const save_file = (doc) => {
 		if (doc.thumb) {
