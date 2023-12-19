@@ -6,6 +6,7 @@ module.exports = function(waw) {
 		url: { type: String, sparse: true, trim: true, unique: true },
 		short: String,
 		description: String,
+		domain: String,
 		isTemplate: Boolean,
 		domain: String,
  		template: {
@@ -40,6 +41,8 @@ module.exports = function(waw) {
 		this.domain = obj.domain;
 
 		this.thumb = obj.thumb;
+
+		this.domain = obj.domain;
 
 		this.url = obj.url;
 
