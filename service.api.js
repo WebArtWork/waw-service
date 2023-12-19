@@ -72,17 +72,31 @@ module.exports = async waw => {
 			}
 		],
 		update: {
-			name: 'admin',
-			ensure: waw.role('admin'),
 			query: (req) => {
-				return { _id: req.body._id };
+				if (req.user.is.admin) {
+					return {
+						_id: req.body._id,
+					};
+				} else {
+					return {
+						moderators: req.user._id,
+						_id: req.body._id,
+					};
+				}
 			}
 		},
 		delete: {
-			name: 'admin',
-			ensure: waw.role('admin'),
 			query: (req) => {
-				return { _id: req.body._id };
+				if (req.user.is.admin) {
+					return {
+						_id: req.body._id,
+					};
+				} else {
+					return {
+						moderators: req.user._id,
+						_id: req.body._id,
+					};
+				}
 			}
 		},
 		fetch: {
