@@ -2,6 +2,18 @@ const path = require('path');
 const template = path.join(process.cwd(), 'template');
 
 module.exports = async waw => {
+	waw.services = async (query = {}, limit, count = false) => {
+		let exe = count ? waw.Service.countDocuments(query) : waw.Service.find(query);
+		if (limit) {
+			exe = exe.limit(limit);
+		}
+		return await exe;
+	};
+
+	waw.service = async (query) => {
+		return await waw.Service.findOne(query);
+	}
+
 	waw.crud('service', {
 		get: [
 			{
@@ -195,6 +207,73 @@ module.exports = async waw => {
 		)
 	}
 
+	waw.operatorServices = async (operator, fillJson) => {
+		fillJson.services = await waw.services({
+			domain: operator.domain
+		});
+
+		fillJson.servicesByTag = [];
+		for (const service of fillJson.services) {
+			if (!service.tag) continue;
+			const tagObj = fillJson.servicesByTag.find(c => c.id.toString() === service.tag.toString());
+			if (tagObj) {
+				tagObj.services.push(service);
+			} else {
+				const tag = waw.getTag(service.tag);
+
+				fillJson.servicesByTag.push({
+					id: service.tag,
+					category: tag.category,
+					name: tag.name,
+					description: tag.description,
+					services: [service]
+				})
+			}
+		}
+
+		fillJson.servicesByCategory = [];
+		for (const byTag of fillJson.servicesByTag) {
+			const categoryObj = fillJson.servicesByCategory.find(c => c.id.toString() === byTag.category.toString());
+			if (categoryObj) {
+				categoryObj.tags.push(byTag);
+
+				for (const service of byTag.services) {
+					if (!categoryObj.services.find(s => s.id === service.id)) {
+						categoryObj.services.push(service)
+					}
+				}
+			} else {
+				const category = waw.getCategory(byTag.category);
+
+				fillJson.servicesByCategory.push({
+					id: byTag.category,
+					name: category.name,
+					description: category.description,
+					services: byTag.services.slice(),
+					tags: [byTag]
+				})
+			}
+		}
+	}
+
+	waw.operatorService = async (operator, fillJson, req) => {
+		fillJson.service = await waw.service({
+			domain: operator.domain,
+			_id: req.params._id
+		});
+
+		fillJson.footer.service = fillJson.service;
+	}
+
+	waw.operatorTopServices = async (operator, fillJson) => {
+		fillJson.topServices = await waw.services({
+			domain: operator.domain
+		}, 4);
+
+		fillJson.footer.topServices = fillJson.topServices;
+	}
+
+
 	waw.storeServices = async (store, fillJson) => {
 		fillJson.services = await waw.services({
 			author: store.author
@@ -261,18 +340,6 @@ module.exports = async waw => {
 		}, 4);
 
 		fillJson.footer.topServices = fillJson.topServices;
-	}
-
-	waw.services = async (query = {}, limit, count = false) => {
-		let exe = count ? waw.Service.countDocuments(query) : waw.Service.find(query);
-		if (limit) {
-			exe = exe.limit(limit);
-		}
-		return await exe;
-	};
-
-	waw.service = async (query) => {
-		return await waw.Service.findOne(query);
 	}
 	const save_file = (doc) => {
 		if (doc.thumb) {
