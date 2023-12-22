@@ -243,15 +243,16 @@ module.exports = async waw => {
 					}
 				}
 			} else {
-				const category = waw.getCategory(byTag.category);
-
-				fillJson.servicesByCategory.push({
-					id: byTag.category,
-					name: category.name,
-					description: category.description,
-					services: byTag.services.slice(),
-					tags: [byTag]
-				})
+				const category = waw.getCategory(byTag.category)
+				if (category) {
+					fillJson.servicesByCategory.push({
+						id: byTag.category,
+						name: category.name,
+						description: category.description,
+						services: byTag.services.slice(),
+						tags: [byTag]
+					})
+				}
 			}
 		}
 	}
