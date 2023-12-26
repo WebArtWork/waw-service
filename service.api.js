@@ -176,9 +176,6 @@ module.exports = async waw => {
 			pages: "service services",
 		},
 		page: {
-			"/test/:any": (req, res) => {
-				res.json(req.urlParams);
-			},
 			"/services": waw.serveServices,
 			"/services/:tag_id": waw.serveServices,
 			"/service/:_id": waw.serveService
