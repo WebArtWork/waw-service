@@ -114,7 +114,9 @@ module.exports = async waw => {
 						.toLowerCase()
 						.replace(/[^a-z0-9]/g, "");
 				}
-				if (req.body.url) {
+				if (!req.body.url) {
+					req.body.url = null; 
+				} else {
 					while (await waw.Service.count({ url: req.body.url })) {
 						const url = req.body.url.split("_");
 						req.body.url =
