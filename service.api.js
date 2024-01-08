@@ -229,15 +229,11 @@ module.exports = async waw => {
 				})
 			}
 		}
-
 		fillJson.servicesByCategory = [];
 		for (const byTag of fillJson.servicesByTag) {
 			const categoryObj = fillJson.servicesByCategory.find(c => c.id.toString() === byTag.category.toString());
-				if (categoryObj) {
-					if (!categoryObj.tags) {
-						categoryObj.tags = [];
-					}
-					categoryObj.tags.push(byTag);
+			if (categoryObj) {
+				categoryObj.tags.push(byTag);
 
 				for (const service of byTag.services) {
 					if (!categoryObj.services.find(s => s.id === service.id)) {
