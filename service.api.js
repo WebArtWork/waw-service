@@ -115,7 +115,7 @@ module.exports = async waw => {
 						.replace(/[^a-z0-9]/g, "");
 				}
 				if (!req.body.url) {
-					req.body.url = null; 
+					req.body.url = null;
 				} else {
 					while (await waw.Service.count({ url: req.body.url })) {
 						const url = req.body.url.split("_");
@@ -218,15 +218,16 @@ module.exports = async waw => {
 			if (tagObj) {
 				tagObj.services.push(service);
 			} else {
-				const tag = waw.getTag(service.tag);
-
-				fillJson.servicesByTag.push({
-					id: service.tag,
-					category: tag.category,
-					name: tag.name,
-					description: tag.description,
-					services: [service]
-				})
+				const tag = waw.getTag(service.tag)
+				if (tag && tag.category) {
+					fillJson.servicesByTag.push({
+						id: service.tag,
+						category: tag.category,
+						name: tag.name,
+						description: tag.description,
+						services: [service]
+					})
+				}
 			}
 		}
 		fillJson.servicesByCategory = [];
