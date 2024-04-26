@@ -21,6 +21,8 @@
       },
       {
         "keys": [
+          "top",
+          "enabled",
           "thumb",
           "thumbs",
           "name",
@@ -28,6 +30,7 @@
           "price",
           "short",
           "tag",
+          "tags",
           "sale",
           "data"
         ]

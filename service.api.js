@@ -17,9 +17,6 @@ module.exports = async waw => {
 	waw.crud('service', {
 		get: [
 			{
-				ensure: waw.next
-			},
-			{
 				name: 'public',
 				ensure: waw.next,
 				query: () => {
@@ -62,12 +59,6 @@ module.exports = async waw => {
 				ensure: waw.role('admin'),
 				query: () => {
 					return {};
-				}
-			},
-			{
-				ensure: waw.next,
-				query: req => {
-					return { domain: req.get('host') };
 				}
 			}
 		],
@@ -132,15 +123,58 @@ module.exports = async waw => {
 				next();
 			}
 		}
-	})
+	});
 
-	const docs = await waw.Service.find({});
-	for (const doc of docs) {
-		if (!doc.domain) {
-			doc.domain = waw.config.land;
-			await doc.save();
+
+
+	const reloads = {};
+	waw.addJson(
+		"storePrepareServices",
+		async (store, fillJson, req) => {
+			reloads[store._id] = reloads[store._id] || [];
+			const fillAllServices = async () => {
+				fillJson.allServices = await waw.Service.find({
+					tags: {
+						$in: fillJson.tagsIds,
+					},
+				}).lean();
+				for (const service of fillJson.allServices) {
+					service.id = service._id.toString();
+					service._id = service._id.toString();
+					service.tags = (service.tags||[]).map(t => t.toString());
+				}
+				fillJson.top_services = fillJson.allServices.filter((p) => {
+					return p.top;
+				});
+			};
+			fillAllServices();
+			reloads[store._id].push(fillAllServices);
+		},
+		"Prepare updatable documents of services"
+	);
+	const tagsUpdate = async (tag) => {
+		setTimeout(() => {
+			for (const storeId of (tag.stores || [])) {
+				for (const reload of (reloads[storeId] || [])) {
+					reload();
+				}
+			}
+		}, 2000);
+	};
+	waw.on("tag_create", tagsUpdate);
+	waw.on("tag_update", tagsUpdate);
+	waw.on("tag_delete", tagsUpdate);
+	const servicesUpdate = async (service) => {
+		const tags = await waw.Tag.find({
+			_id: service.tags,
+		});
+		for (const tag of tags) {
+			tagsUpdate(tag);
 		}
-	}
+	};
+	waw.on("service_create", servicesUpdate);
+	waw.on("service_update", servicesUpdate);
+	waw.on("service_delete", servicesUpdate);
 
 
 	waw.serveServices = async (req, res) => {
@@ -170,19 +204,19 @@ module.exports = async waw => {
 		)
 	}
 
-	waw.api({
-		domain: waw.config.land,
-		template: {
-			path: template,
-			prefix: "/template",
-			pages: "service services",
-		},
-		page: {
-			"/services": waw.serveServices,
-			"/services/:tag_id": waw.serveServices,
-			"/service/:_id": waw.serveService
-		}
-	});
+	// waw.api({
+	// 	domain: waw.config.land,
+	// 	template: {
+	// 		path: template,
+	// 		prefix: "/template",
+	// 		pages: "service services",
+	// 	},
+	// 	page: {
+	// 		"/services": waw.serveServices,
+	// 		"/services/:tag_id": waw.serveServices,
+	// 		"/service/:_id": waw.serveService
+	// 	}
+	// });
 
 	waw.serveService = async (req, res) => {
 		const service = await waw.Service.findOne(
